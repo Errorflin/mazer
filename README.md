@@ -1,2 +1,2 @@
-# mazer
+# Mazer
 Mazer Game
