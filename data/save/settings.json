@@ -1,0 +1,1 @@
+{"movement": {"up": [1073741906, "Move Up"], "down": [115, "Move Down"], "left": [97, "Move Left"], "right": [100, "Move Right"], "sprint": [1073742049, "Sprint"]}, "keys": {"place marker": [109, "Place Marker"], "change marker": [110, "Change Marker"], "reset position": [114, "Reset Position"]}, "display": {"fullscreen": true}, "audio": {"music volume": 100, "sfx volume": 100}}
