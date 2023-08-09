@@ -40,7 +40,48 @@ game_data = {
         "player_pos": "S",
         "coins": [],
         "marks": []
-    }
+    },
+    "level_5": {
+        "locked": True,
+        "player_pos": "S",
+        "coins": [],
+        "marks": []
+    },
+    "level_6": {
+        "locked": True,
+        "player_pos": "S",
+        "coins": [],
+        "keys": [],
+        "marks": []
+    },
+    "level_7": {
+        "locked": True,
+        "player_pos": "S",
+        "coins": [],
+        "keys": [],
+        "marks": []
+    },
+    "level_8": {
+        "locked": True,
+        "player_pos": "S",
+        "coins": [],
+        "keys": [],
+        "marks": []
+    },
+    "level_9": {
+        "locked": True,
+        "player_pos": "S",
+        "coins": [],
+        "keys": [],
+        "marks": []
+    },
+    "level_10": {
+        "locked": True,
+        "player_pos": "S",
+        "coins": [],
+        "keys": [],
+        "marks": []
+    },
 }
 
 game_data_location = "save/data.dat"
@@ -282,7 +323,10 @@ tile_size = 3
 # Load the tilemap from a file
 def load_tilemap(filename):
     with open(filename, 'r') as file:
-        data = file.readlines()
+        encrypted_data = file.read()
+        fernet = Fernet(encryption_key)
+        data = pickle.loads(fernet.decrypt(encrypted_data))
+        #data = file.readlines()
     tilemap = [line.strip() for line in data]
     return tilemap
 
@@ -473,16 +517,22 @@ def shop():
 # Load tilemap
 tilemap = None
 
-level1_map = "levels/level_1.txt"
-level2_map = "levels/level_2.txt"
-level3_map = "levels/level_3.txt"
-level4_map = "levels/level_4.txt"
+level1_map = "levels/level_1.lvl" # 5
+level2_map = "levels/level_2.lvl" # 10
+level3_map = "levels/level_3.lvl" # 12
+level4_map = "levels/level_4.lvl" # 15
+level5_map = "levels/level_5.lvl" # 17
+level6_map = "levels/level_6.lvl" # 20
+level7_map = "levels/level_7.lvl" # 23
+level8_map = "levels/level_8.lvl" # 26
+level9_map = "levels/level_9.lvl" # 30
+level10_map = "levels/level_10.lvl" # 33
 
 def level_select():
     global tilemap, game_data
     game_data = load_game_data()
 
-    levels_items = ["LEVEL 1", "LEVEL 2", "LEVEL 3", "LEVEL 4"]
+    levels_items = ["LEVEL 1", "LEVEL 2", "LEVEL 3", "LEVEL 4", "LEVEL 5", "LEVEL 6", "LEVEL 7", "LEVEL 8", "LEVEL 9", "LEVEL 10"]
     item_selected = 0
 
     # Game title and version
@@ -528,6 +578,30 @@ def level_select():
                         tilemap = load_tilemap(level4_map)
                         switcher = False
                         game("level_4")
+                    elif item_selected == 4 and not game_data["level_5"]["locked"]:  # LEVEL 5
+                        tilemap = load_tilemap(level5_map)
+                        switcher = False
+                        game("level_5")
+                    elif item_selected == 5 and not game_data["level_6"]["locked"]:  # LEVEL 6
+                        tilemap = load_tilemap(level6_map)
+                        switcher = False
+                        game("level_6")
+                    elif item_selected == 6 and not game_data["level_7"]["locked"]:  # LEVEL 7
+                        tilemap = load_tilemap(level7_map)
+                        switcher = False
+                        game("level_7")
+                    elif item_selected == 7 and not game_data["level_8"]["locked"]:  # LEVEL 8
+                        tilemap = load_tilemap(level8_map)
+                        switcher = False
+                        game("level_8")
+                    elif item_selected == 8 and not game_data["level_9"]["locked"]:  # LEVEL 9
+                        tilemap = load_tilemap(level9_map)
+                        switcher = False
+                        game("level_9")
+                    elif item_selected == 9 and not game_data["level_10"]["locked"]:  # LEVEL 10
+                        tilemap = load_tilemap(level10_map)
+                        switcher = False
+                        game("level_10")
                 elif event.key == pygame.K_s:
                     switcher = False
                     shop()
@@ -547,35 +621,71 @@ def level_select():
             else:
                 color = (255, 255, 255)
 
-            text = SegoeUIBold80.render(item, True, color)
-            text_rect = text.get_rect(topleft=(200, 150 + i * 70))
+            text = SegoeUIBold60.render(item, True, color)
+            text_rect = text.get_rect(topleft=(20, 125 + i * 55))
             screen.blit(text, text_rect)
 
             # Change info about level
             if item_selected == 0: # LEVEL 1
                 locked = game_data["level_1"]["locked"]
-                difficulty = 2
-                level_title = "SMALLER MAZE"
-                est_time = "<2min"
+                difficulty = 0.2
+                level_title = "NANO NEXUS"
+                est_time = "x min"
                 coins_remaining = len(game_data["level_1"]["coins"])
             if item_selected == 1: # LEVEL 2
                 locked = game_data["level_2"]["locked"]
-                difficulty = 12
-                level_title = "SMALL MAZE"
-                est_time = "~6min"
+                difficulty = 1
+                level_title = "MICROCOSM MAZE"
+                est_time = "x min"
                 coins_remaining = len(game_data["level_2"]["coins"])
             if item_selected == 2: # LEVEL 3
                 locked = game_data["level_3"]["locked"]
-                difficulty = 22
-                level_title = "MEDIUM MAZE"
-                est_time = "~10min"
+                difficulty = 4
+                level_title = "PETITE PASSAGEWAY"
+                est_time = "x min"
                 coins_remaining = len(game_data["level_3"]["coins"])
             if item_selected == 3: # LEVEL 4
                 locked = game_data["level_4"]["locked"]
-                difficulty = 31
-                level_title = "BIG MAZE"
-                est_time = "~15min"
+                difficulty = 6
+                level_title = "Diminutive Dungeon".upper()
+                est_time = "x min"
                 coins_remaining = len(game_data["level_4"]["coins"])
+            if item_selected == 4: # LEVEL 5
+                locked = game_data["level_5"]["locked"]
+                difficulty = 11
+                level_title = "Atom Alley".upper()
+                est_time = "x min"
+                coins_remaining = len(game_data["level_5"]["coins"])
+            if item_selected == 5: # LEVEL 6
+                locked = game_data["level_6"]["locked"]
+                difficulty = 16
+                level_title = "Compact Corridor".upper()
+                est_time = "x min"
+                coins_remaining = len(game_data["level_6"]["coins"])
+            if item_selected == 6: # LEVEL 7
+                locked = game_data["level_7"]["locked"]
+                difficulty = 21
+                level_title = "Pocket-Sized Path".upper()
+                est_time = "x min"
+                coins_remaining = len(game_data["level_7"]["coins"])
+            if item_selected == 7: # LEVEL 8
+                locked = game_data["level_8"]["locked"]
+                difficulty = 27
+                level_title = "Middling Maze".upper()
+                est_time = "x min"
+                coins_remaining = len(game_data["level_8"]["coins"])
+            if item_selected == 8: # LEVEL 9
+                locked = game_data["level_9"]["locked"]
+                difficulty = 32
+                level_title = "Average Amaze".upper()
+                est_time = "x min"
+                coins_remaining = len(game_data["level_9"]["coins"])
+            if item_selected == 9: # LEVEL 10
+                locked = game_data["level_10"]["locked"]
+                difficulty = 38
+                level_title = "Balanced Bafflement".upper()
+                est_time = "x min"
+                coins_remaining = len(game_data["level_10"]["coins"])
 
         # Display info about level
         if locked: info_color = (150, 150, 150)
@@ -586,15 +696,15 @@ def level_select():
         time_info = SegoeUIBold30.render(f"{est_time}", True, info_color)
         locked_info = SegoeUIBold30.render(f"{'LOCKED' if locked else 'UNLOCKED'}", True, info_color)
 
-        maze_title_rect = maze_title.get_rect(topleft=(screen_size[0] // 2 - 100, 200))
-        difficulty_info_rect = difficulty_info.get_rect(topleft=(screen_size[0] // 2 - 100, 285))
+        maze_title_rect = maze_title.get_rect(topleft=(300, 200))
+        difficulty_info_rect = difficulty_info.get_rect(topleft=(300, 285))
         difficulty_text_rect = difficulty_text.get_rect(midleft=(difficulty_info_rect.midright[0] + 10, difficulty_info_rect.midright[1]))
-        time_info_rect = time_info.get_rect(bottomleft=(screen_size[0] // 2 - 100, 230))
+        time_info_rect = time_info.get_rect(bottomleft=(300, 230))
         locked_info_rect = locked_info.get_rect(midleft=(time_info_rect.midright[0] + 30, time_info_rect.midright[1]))
-        if coins_remaining != 0:
-            pass
-        else:
+        if coins_remaining == 0:
             coins_remaining = "???"
+        if coins_remaining == 1:
+            coins_remaining = 0
         coin_img = pygame.transform.scale(coin_image, (20, 20))
         coin_info = SegoeUIBold30.render(f"{coins_remaining}", True, info_color)
         coin_img_rect = coin_img.get_rect(midleft=(difficulty_text_rect.midright[0] + 20, difficulty_text_rect.midright[1] + 2))
@@ -629,6 +739,12 @@ def new_level(prev_level):
     if prev_level == "level_1": next_level = "level_2"; tilemap = load_tilemap(level2_map)
     if prev_level == "level_2": next_level = "level_3"; tilemap = load_tilemap(level3_map)
     if prev_level == "level_3": next_level = "level_4"; tilemap = load_tilemap(level4_map)
+    if prev_level == "level_4": next_level = "level_5"; tilemap = load_tilemap(level5_map)
+    if prev_level == "level_5": next_level = "level_6"; tilemap = load_tilemap(level6_map)
+    if prev_level == "level_6": next_level = "level_7"; tilemap = load_tilemap(level7_map)
+    if prev_level == "level_7": next_level = "level_8"; tilemap = load_tilemap(level8_map)
+    if prev_level == "level_8": next_level = "level_9"; tilemap = load_tilemap(level9_map)
+    if prev_level == "level_9": next_level = "level_10"; tilemap = load_tilemap(level10_map)
 
     game_data[f"{next_level}"]["locked"] = False
     game_data[prev_level]["player_pos"] = 'S'
@@ -651,17 +767,41 @@ def new_level(prev_level):
                     switcher = False
                     game(next_level)
 
-        title = SegoeUIBold90.render("CONGRATULATIONS!", True, (50, 220, 150))
+        title = SegoeUIBold80.render("CONGRATULATIONS!", True, (50, 200, 130))
         title_rect = title.get_rect(center=(screen_size[0] // 2, 55))
         screen.blit(title, title_rect)
-        subtitle =  SegoeUIBold60.render(f"{prev_level.replace('_', ' ').title()} - {next_level.replace('_', ' ').title()}", True, (255, 255, 255))
-        subtitle_rect = subtitle.get_rect(center=(screen_size[0] // 2, 100))
+        subtitle = SegoeUIBold60.render(f"On completing {prev_level.replace('_', ' ').title()}", True, (255, 255, 255))
+        subtitle_rect = subtitle.get_rect(center=(screen_size[0] // 2, 130))
         screen.blit(subtitle, subtitle_rect)
+        coins_img = pygame.transform.scale(coin_image, (30, 30))
+        coins_img_rect = coins_img.get_rect(center=(screen_size[0] // 2 - 100))
+        screen.blit(coins_img, coins_img_rect)
+        subtitle2 = SegoeUIBold40.render(f'{game_data["player"]["coins"]}/{len(game_data[prev_level]["coins"])-1} in this level', True, (220, 200, 10))
+        subtitle2_rect = subtitle2.get_rect(midleft=(coins_img_rect.midright[0] + 10, coins_img_rect.midright[1]))
+        screen.blit(subtitle2, subtitle2_rect)
 
         info_txt1 = SegoeUIBold20.render("[ESC] Level Select", True, (40, 40, 40))
-        screen.blit(info_txt1, (title_rect.midright[0] + 10, title_rect.midright[1] - 10))
+        screen.blit(info_txt1, (title_rect.midright[0] + 10, title_rect.midright[1] - 15))
         info_txt2 = SegoeUIBold20.render("[ENTER] Next Level", True, (40, 40, 40))
-        screen.blit(info_txt2, (title_rect.bottomright[0] + 10, title_rect.bottomright[1] - 50))
+        screen.blit(info_txt2, (title_rect.bottomright[0] + 10, title_rect.bottomright[1] - 40))
+
+        for mark_i in range(3):
+            mark_gui_pos = (screen_size[0] // - 100, 320)
+            mark_gui_image = None
+            text = ""
+            if mark_i == 0:
+                mark_gui_image = pygame.transform.scale(red_mark_image, (20, 20))
+                text = f'{game_data["player"]["marks"][0]}'
+            elif mark_i == 1:
+                mark_gui_image = pygame.transform.scale(green_mark_image, (20, 20))
+                text = f'{game_data["player"]["marks"][1]}'
+            elif mark_i == 2:
+                mark_gui_image = pygame.transform.scale(blue_mark_image, (20, 20))
+                text = f'{game_data["player"]["marks"][2]}'
+            mark_text = SegoeUIBold20.render(text, True, (255, 255, 255))
+            mark_gui_rect = mark_gui_image.get_rect(center=(mark_gui_pos))
+            screen.blit(mark_gui_image, mark_gui_rect)
+            screen.blit(mark_text, mark_text.get_rect(midleft=(mark_gui_rect.midright[0] + 10, mark_gui_rect.midright[1])))
 
         pygame.display.update()
         clock.tick(fps_limit)
@@ -722,6 +862,12 @@ def game(level):
 
     m_key_pressed = False
     r_key_pressed = False
+
+    ticks = 0
+    starttime = pygame.time.get_ticks()
+    minutes = 0
+    seconds = 0
+    millis = 0
 
     switcher = True
     while switcher:
@@ -846,16 +992,29 @@ def game(level):
         
         # Display frame rate in the top-left corner
         frame_rate = clock.get_fps()
-        frame_rate_text = SegoeUIBold20.render(f"{level} FPS: {frame_rate:.2f}", True, (255, 255, 255))
+        frame_rate_text = SegoeUIBold20.render(f"FPS: {frame_rate:.2f}", True, (255, 255, 255))
         screen.blit(frame_rate_text, (10, 10))
 
+        level_info = SegoeUIBold20.render(f"{level.replace('_', ' ').title()}", True, (255, 255, 255))
+        level_info_rect = level_info.get_rect(center=(screen_size[0] // 2, 90))
+        screen.blit(level_info, level_info_rect)
+
+        ticks = pygame.time.get_ticks() - starttime
+        millis = ticks % 1000
+        seconds = int(ticks / 1000 % 60)
+        minutes = int(ticks / 60000 % 24)
+
+        timer_text = SegoeUIBold80.render(f'{minutes:02d}:{seconds:02d}:{millis:03d}', True, (255, 255, 255))
+        timer_text_rect = timer_text.get_rect(center=(screen_size[0] // 2, 35))
+        screen.blit(timer_text, timer_text_rect)
+
         # Display coins at the bottom | GUI
+        coins_img = pygame.transform.scale(coin_image, (20, 20))
+        coins_img_rect = coins_img.get_rect(center=(20, screen_size[1] - 50))
         coins = player.coins
-        coins_lenght = len(str(coins))
         coins_text = SegoeUIBold20.render(f"{coins}", True, (255, 255, 255))
-        coins_text_rect = coins_text.get_rect(center=(45 + 5 * coins_lenght, screen_size[1] - 50))
-        screen.blit(coins_text, coins_text_rect)
-        screen.blit(pygame.transform.scale(coin_image, (20, 20)), (pygame.transform.scale(coin_image, (20, 20)).get_rect(center=(20, screen_size[1] - 50))))
+        screen.blit(coins_text, coins_text.get_rect(midleft=(coins_img_rect.midright[0] + 10, coins_img_rect.midright[1])))
+        screen.blit(coins_img, coins_img_rect)
         
         for mark_i in range(3):
             mark_gui_pos = (20 + mark_i * 60, screen_size[1] - 20)
