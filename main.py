@@ -487,12 +487,12 @@ def shop():
     
     player = Player(game_data["player"]["coins"], game_data["player"]["marks"])
     
-    shop_items = ["RED MARKER", "GREEN MARKER", "BLUE MARKER", "PAUSE"]
+    shop_items = [["RED MARKER", 50], ["GREEN MARKER", 50], ["BLUE MARKER", 50]]
     item_selected = 0
 
     # Game title and version
     title_text = SegoeUIBold120.render("SHOP", True, (255, 255, 255))
-    title_rect = title_text.get_rect(topleft=(10, 10))
+    title_rect = title_text.get_rect(center=(screen_size[0] // 2, 70))
 
     color = (20, 20, 20)
     switcher = True
@@ -510,14 +510,17 @@ def shop():
                     item_selected = (item_selected + 1) % len(shop_items)
                 elif event.key == pygame.K_RETURN:
                     if item_selected == 0:  # RED MARK
-                        if player.marks[0] < 10:
+                        if player.marks[0] < 9:
                             player.marks[0] += 1
+                            player.coins -= shop_items[item_selected][1]
                     elif item_selected == 1:  # GREEN MARK
-                        if player.marks[1] < 10:
+                        if player.marks[1] < 9:
                             player.marks[1] += 1
+                            player.coins -= shop_items[item_selected][1]
                     elif item_selected == 2:  # BLUE MARK
-                        if player.marks[2] < 10:
+                        if player.marks[2] < 9:
                             player.marks[2] += 1
+                            player.coins -= shop_items[item_selected][1]
                     elif item_selected == 3:  # PAUSE
                         pass
                 elif event.key == pygame.K_ESCAPE:
@@ -534,14 +537,45 @@ def shop():
             else:
                 color = (255, 255, 255)
 
-            text = SegoeUIBold80.render(item, True, color)
-            text_rect = text.get_rect(topleft=(10, 150 + i * 50))
+            text = SegoeUIBold40.render(f'x1 {item[0]}', True, color)
+            text_rect = text.get_rect(topleft=(300, 150 + i * 50))
             screen.blit(text, text_rect)
+            price = SegoeUIBold40.render(f'{item[1]}', True, (255, 255, 255))
+            price_rect = price.get_rect(midright=(text_rect.midleft[0] - 10, text_rect.midleft[1]))
+            screen.blit(price, price_rect)
+            coin_img = pygame.transform.scale(coin_image, (30, 30))
+            coin_img_rect = coin_img.get_rect(midright=(price_rect.midleft[0] - 10, price_rect.midleft[1]))
+            screen.blit(coin_img, coin_img_rect)
+
+        # Display coins at the bottom | GUI
+        coins_img = pygame.transform.scale(coin_image, (20, 20))
+        coins_img_rect = coins_img.get_rect(center=(20, screen_size[1] - 50))
+        coins = player.coins
+        coins_text = SegoeUIBold20.render(f"{coins}", True, (255, 255, 255))
+        screen.blit(coins_text, coins_text.get_rect(midleft=(coins_img_rect.midright[0] + 10, coins_img_rect.midright[1])))
+        screen.blit(coins_img, coins_img_rect)
+        
+        for mark_i in range(3):
+            mark_gui_pos = (20 + mark_i * 60, screen_size[1] - 20)
+            mark_gui_image = None
+            text = ""
+            if mark_i == 0:
+                mark_gui_image = pygame.transform.scale(red_mark_image, (20, 20))
+                text = f"{player.marks[0]}"
+            elif mark_i == 1:
+                mark_gui_image = pygame.transform.scale(green_mark_image, (20, 20))
+                text = f"{player.marks[1]}"
+            elif mark_i == 2:
+                mark_gui_image = pygame.transform.scale(blue_mark_image, (20, 20))
+                text = f"{player.marks[2]}"
+            mark_text = SegoeUIBold20.render(text, True, (255, 255, 255))
+            screen.blit(mark_text, mark_text.get_rect(center=(mark_gui_pos[0] + 25, mark_gui_pos[1])))
+            screen.blit(mark_gui_image, mark_gui_image.get_rect(center=(mark_gui_pos)))
 
         info_txt1 = SegoeUIBold20.render("[ESC] Back", True, (40, 40, 40))
-        screen.blit(info_txt1, (450, 35))
+        screen.blit(info_txt1, info_txt1.get_rect(midleft=(title_rect.midright[0] + 10, title_rect.midright[1])))
         info_txt2 = SegoeUIBold20.render("[ENTER] Buy", True, (40, 40, 40))
-        screen.blit(info_txt2, (450, 65))
+        screen.blit(info_txt2, info_txt2.get_rect(bottomleft=(title_rect.bottomright[0] + 10, title_rect.bottomright[1] - 30)))
 
         pygame.display.update()
 
