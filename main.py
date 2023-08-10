@@ -378,6 +378,8 @@ blue_mark_image.set_colorkey((255, 255, 255))
 coin_image = pygame.image.load("sprites/coin.png").convert()
 select_image = pygame.image.load("sprites/select.png").convert()
 end_marker_image = pygame.image.load("sprites/end_marker.png").convert()
+key_image = pygame.image.load("sprites/key.png").convert()
+key_image.set_colorkey((255, 255, 255))
 
 blank_grey_image = pygame.image.load("sprites/blank_grey.png").convert()
 blank_red_image = pygame.image.load("sprites/blank_red.png").convert()
@@ -455,6 +457,12 @@ class EndMarker(pygame.sprite.Sprite):
         self.image = end_marker_image
         self.rect = self.image.get_rect(topleft=(x * tile_size, y * tile_size))
 
+class Key(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = key_image
+        self.rect = self.image.get_rect(center=(x * tile_size, y * tile_size))
+
 # ------------------------------------------------------------------------ UTILS
 # Define a function that smoothly interpolate values (lerp)
 def lerp(a, b, t):
@@ -501,6 +509,9 @@ def shop():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                game_data["player"]["marks"] = player.marks
+                game_data["player"]["coins"] = player.coins
+                save_game_data(game_data)
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
@@ -510,20 +521,21 @@ def shop():
                     item_selected = (item_selected + 1) % len(shop_items)
                 elif event.key == pygame.K_RETURN:
                     if item_selected == 0:  # RED MARK
-                        if player.marks[0] < 9:
+                        if player.marks[0] < 9 and player.coins >= shop_items[item_selected][1]:
                             player.marks[0] += 1
                             player.coins -= shop_items[item_selected][1]
                     elif item_selected == 1:  # GREEN MARK
-                        if player.marks[1] < 9:
+                        if player.marks[1] < 9  and player.coins >= shop_items[item_selected][1]:
                             player.marks[1] += 1
                             player.coins -= shop_items[item_selected][1]
                     elif item_selected == 2:  # BLUE MARK
-                        if player.marks[2] < 9:
+                        if player.marks[2] < 9  and player.coins >= shop_items[item_selected][1]:
                             player.marks[2] += 1
                             player.coins -= shop_items[item_selected][1]
-                    elif item_selected == 3:  # PAUSE
-                        pass
                 elif event.key == pygame.K_ESCAPE:
+                    game_data["player"]["marks"] = player.marks
+                    game_data["player"]["coins"] = player.coins
+                    save_game_data(game_data)
                     switcher = False
                     level_select()
 
@@ -891,6 +903,7 @@ def game(level):
     marks = pygame.sprite.Group()
     coins_group = pygame.sprite.Group()
     end_marks = pygame.sprite.Group()
+    keys = pygame.sprite.Group()
 
     current_mark_color = 2 # 1 - RED, 2 - GREEN, 3 - BLUE
 
@@ -908,11 +921,14 @@ def game(level):
                 end_marks.add(end_mark)
             if tile == 'S' and game_data[level]["player_pos"] == 'S':
                 player.rect.center = (x * tile_size, y * tile_size)
-            elif tile == '0' and game_data[level]["coins"] == [] and y > 5:
+            if tile == '0' and game_data[level]["coins"] == []:
                 n = random.randint(0, 1000)
                 if n <= 2:
                     coin = Coin(x * tile_size, y * tile_size)
                     coins_group.add(coin)
+            if tile == 'K':
+                key = Key(x, y)
+                keys.add(key)
 
     if game_data[level]["player_pos"] != 'S':
         player.rect.center = game_data[level]["player_pos"]
@@ -1059,6 +1075,9 @@ def game(level):
         for coin_ in coins_group:
             if coin_.rect.colliderect(camera_rect):
                 screen.blit(coin_.image, (coin_.rect.x - camera_x, coin_.rect.y - camera_y))
+        for key_ in keys:
+            if key_.rect.colliderect(camera_rect):
+                screen.blit(key_.image, (key_.rect.x - camera_x, key_.rect.y - camera_y))
         if player.rect.colliderect(camera_rect):
             screen.blit(player.image, (player.rect.x - camera_x, player.rect.y - camera_y))
         
