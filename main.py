@@ -251,6 +251,41 @@ def settings_menu():
 
         pygame.display.update()
         clock.tick(fps_limit)
+# ------------------------------------------------------------------------ SPLASH SCREEN
+def splash():
+    elapsed = 0
+
+    switcher = True
+    while switcher:
+        screen.fill((20, 20, 20))
+
+        elapsed += 1
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                switcher = False
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    switcher = False
+                    pygame.quit()
+                    sys.exit()
+
+        if elapsed < 120:
+            studios = SegoeUIBold90.render("ERRORFLIN STUDIOS", True, (255, 255, 255))
+            studios_rect = studios.get_rect(center=(screen_size[0] // 2, screen_size[1] // 2))
+            screen.blit(studios, studios_rect)
+        else:
+            dedication = SegoeUI30.render("Made for IGI", True, (255, 255, 255))
+            dedication_rect = dedication.get_rect(center=(screen_size[0] // 2, screen_size[1] // 2))
+            screen.blit(dedication, dedication_rect)
+        if elapsed == 240:
+            switcher = False
+            return
+
+        pygame.display.update()
+        clock.tick(fps_limit)
 
 # ------------------------------------------------------------------------ MAIN MENU
 # Create a simple menu
@@ -630,43 +665,43 @@ def level_select():
                 locked = game_data["level_1"]["locked"]
                 difficulty = 0.2
                 level_title = "NANO NEXUS"
-                est_time = "x min"
+                est_time = "~7s"
                 coins_remaining = len(game_data["level_1"]["coins"])
             if item_selected == 1: # LEVEL 2
                 locked = game_data["level_2"]["locked"]
                 difficulty = 1
                 level_title = "MICROCOSM MAZE"
-                est_time = "x min"
+                est_time = "~25s"
                 coins_remaining = len(game_data["level_2"]["coins"])
             if item_selected == 2: # LEVEL 3
                 locked = game_data["level_3"]["locked"]
                 difficulty = 4
                 level_title = "PETITE PASSAGEWAY"
-                est_time = "x min"
+                est_time = "~30s"
                 coins_remaining = len(game_data["level_3"]["coins"])
             if item_selected == 3: # LEVEL 4
                 locked = game_data["level_4"]["locked"]
                 difficulty = 6
                 level_title = "Diminutive Dungeon".upper()
-                est_time = "x min"
+                est_time = "~46s"
                 coins_remaining = len(game_data["level_4"]["coins"])
             if item_selected == 4: # LEVEL 5
                 locked = game_data["level_5"]["locked"]
                 difficulty = 11
                 level_title = "Atom Alley".upper()
-                est_time = "x min"
+                est_time = "~53s"
                 coins_remaining = len(game_data["level_5"]["coins"])
             if item_selected == 5: # LEVEL 6
                 locked = game_data["level_6"]["locked"]
                 difficulty = 16
                 level_title = "Compact Corridor".upper()
-                est_time = "x min"
+                est_time = "~1min 10s"
                 coins_remaining = len(game_data["level_6"]["coins"])
             if item_selected == 6: # LEVEL 7
                 locked = game_data["level_7"]["locked"]
                 difficulty = 21
                 level_title = "Pocket-Sized Path".upper()
-                est_time = "x min"
+                est_time = "~2min 30s"
                 coins_remaining = len(game_data["level_7"]["coins"])
             if item_selected == 7: # LEVEL 8
                 locked = game_data["level_8"]["locked"]
@@ -730,7 +765,7 @@ def level_select():
         clock.tick(fps_limit)
 
 # ------------------------------------------------------------------------ NEW LEVEL
-def new_level(prev_level):
+def new_level(prev_level, time):
     global settings, game_data, tilemap
     game_data = load_game_data()
     settings = load_settings()
@@ -773,12 +808,15 @@ def new_level(prev_level):
         subtitle = SegoeUIBold60.render(f"On completing {prev_level.replace('_', ' ').title()}", True, (255, 255, 255))
         subtitle_rect = subtitle.get_rect(center=(screen_size[0] // 2, 130))
         screen.blit(subtitle, subtitle_rect)
+        subtitle2 = SegoeUIBold40.render(f'{game_data["player"]["coins"]}/{len(game_data[prev_level]["coins"])-1} in this level', True, (255, 255, 255))
+        subtitle2_rect = subtitle2.get_rect(center=(screen_size[0] // 2, 300))
         coins_img = pygame.transform.scale(coin_image, (30, 30))
-        coins_img_rect = coins_img.get_rect(center=(screen_size[0] // 2 - 100))
+        coins_img_rect = coins_img.get_rect(midright=(subtitle2_rect.midleft[0] - 10, subtitle2_rect.midleft[1] + 2))
         screen.blit(coins_img, coins_img_rect)
-        subtitle2 = SegoeUIBold40.render(f'{game_data["player"]["coins"]}/{len(game_data[prev_level]["coins"])-1} in this level', True, (220, 200, 10))
-        subtitle2_rect = subtitle2.get_rect(midleft=(coins_img_rect.midright[0] + 10, coins_img_rect.midright[1]))
         screen.blit(subtitle2, subtitle2_rect)
+        subtitle3 = SegoeUIBold40.render(f'{time[0]:02d}:{time[1]:02d}:{time[2]:03d}', True, (255, 255, 255))
+        subtitle3_rect = subtitle3.get_rect(center=(screen_size[0] // 2, 340))
+        screen.blit(subtitle3, subtitle3_rect)
 
         info_txt1 = SegoeUIBold20.render("[ESC] Level Select", True, (40, 40, 40))
         screen.blit(info_txt1, (title_rect.midright[0] + 10, title_rect.midright[1] - 15))
@@ -959,7 +997,7 @@ def game(level):
             game_data["player"]["coins"] = player.coins
             save_game_data(game_data)
             switcher = False
-            new_level(level)
+            new_level(level, [minutes, seconds, millis])
 
         # Update game objects
         player.update(walls)
@@ -1041,6 +1079,7 @@ def game(level):
 
 # Run the game
 clock = pygame.time.Clock()
+splash()
 main_menu()
 
 # Quit Pygame when the game loop ends
